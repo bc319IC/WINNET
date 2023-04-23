@@ -11,11 +11,11 @@ from torch.autograd import Function
 import numpy as np
 import math
 
-from iUNet.utils import get_num_channels
-from iUNet.expm import expm
-from iUNet.cayley import cayley
-from iUNet.householder import householder_transform
-from iUNet.dct import dct_matrix
+from utils.iUNet.utils import get_num_channels
+from utils.iUNet.expm import expm
+from utils.iUNet.cayley import cayley
+from utils.iUNet.householder import householder_transform
+from utils.iUNet.dct import dct_matrix
 
 
 def __calculate_kernel_matrix_exp__(weight, **kwargs):

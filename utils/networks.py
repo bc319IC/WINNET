@@ -326,6 +326,49 @@ class WINNetklvl(nn.Module):
             if self.mode == 'orth':
                 loss = loss + self.innnet[i].learnDownUp.orthogonal()
 
+            #print(len(xd))
+            #print(xd[0].shape)
+            #zeros_tensor=torch.zeros_like(xc[0]) #channels to 0
+            #print(zeros_tensor.shape)
+            #xd_[0][:,0:1,:,:]=zeros_tensor
+            #xd_[0][:,1:2,:,:]=zeros_tensor
+            #xd_[0][:,2:3,:,:]=zeros_tensor
+            #xd_[0][:,3:4,:,:]=zeros_tensor
+            #xd_[0][:,4:5,:,:]=zeros_tensor
+            #xd_[0][:,5:6,:,:]=zeros_tensor
+            #xd_[0][:,6:7,:,:]=zeros_tensor
+            #xd_[0][:,7:8,:,:]=zeros_tensor
+            #xd_[0][:,8:9,:,:]=zeros_tensor
+            #xd_[0][:,9:10,:,:]=zeros_tensor
+            #xd_[0][:,10:11,:,:]=zeros_tensor
+            #xd_[0][:,11:12,:,:]=zeros_tensor
+            #xd_[0][:,12:13,:,:]=zeros_tensor
+            #xd_[0][:,13:14,:,:]=zeros_tensor
+            #xd_[0][:,14:15,:,:]=zeros_tensor
+
+            #xc[0][:,:,:,:]=zeros_tensor
+
+            #feature_tensor=torch.zeros_like(xc[0]) #features to 0
+            #for i in range(127,128):
+                #for j in range(127,128):
+                    #feature_tensor[:,:,i,j]=1
+                #feature_tensor[:,:,i,255-i]=1
+            #print(feature_tensor)
+            #xc_[0]*=feature_tensor
+            #print(xd_[0])
+
+            case=0
+            #if case==0:
+                #tmpxd_=torch.zeros_like(tmpxd_)
+                #tmpxc = torch.zeros_like(tmpxc)
+                #tmpxc[:,:,9:10,9:10]=0.01
+            #elif case==1:
+                #tmpxd_=torch.zeros_like(tmpxd_)
+                #tmpxc = torch.zeros_like(tmpxc)
+                #tmpxd_[:,4:5,9:10,9:10]=0.01
+
+            import matplotlib.pyplot as plt
+
             xd_.append(tmpxd_)
             xc_.append(tmpxc)
 
@@ -336,6 +379,10 @@ class WINNetklvl(nn.Module):
                 out = self.innnet[i].inverse(xc_[i], xd_[i], noiseL if noiseL >= noiseT else noiseT)
 
         loss = loss / len(self.innnet)
+        out1=out.cpu()
+        #plt.imshow(out1[0, 0, :, :])
+        #plt.colorbar()
+        #plt.show()
         return out, loss
 
     def linear(self):
