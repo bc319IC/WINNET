@@ -10,12 +10,13 @@ from utils.networks import WINNetklvl
 from utils.dataset import prepare_data, Dataset
 import time
 from tqdm import tqdm
+import cv2
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 
 parser = argparse.ArgumentParser(description="WINNet")
 parser.add_argument("--preprocess", type=bool, default=True, help='run prepare_data or not')
-parser.add_argument("--batchSize", type=int, default=1, help="Training batch size")
+parser.add_argument("--batchSize", type=int, default=32, help="Training batch size")
 parser.add_argument("--num_of_steps", type=int, default=4, help="Number of steps")
 parser.add_argument("--num_of_layers", type=int, default=4, help="Number of layers")
 parser.add_argument("--num_of_channels", type=int, default=32, help="Number of channels")
@@ -23,7 +24,7 @@ parser.add_argument("--lvl", type=int, default=1, help="number of levels")
 parser.add_argument("--split", type=str, default="dct", help='splitting operator')
 parser.add_argument("--dnlayers", type=int, default=4, help="Number of denoising layers")
 parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
-parser.add_argument("--milestone", type=int, default=30, help="When to decay learning rate; should be less than epochs")
+parser.add_argument("--milestone", type=int, default=3, help="When to decay learning rate; should be less than epochs")
 parser.add_argument("--start_epoch", type=int, default=0, help="start epochs")
 parser.add_argument("--lr", type=float, default=1e-3, help="Initial learning rate")
 parser.add_argument("--decay_rate", type=float, default=0.1, help="decay rate")
@@ -88,9 +89,22 @@ def main():
                     stdRD = np.random.uniform(noiseL_B[0], noiseL_B[1], size=1)
                     stdN = stdRD[0]
                 stdNv = Variable(stdN*torch.ones(1, device=torch.device('cuda:0')))
-                noise = torch.cuda.FloatTensor(img_train.size()).normal_(mean=0, std=stdN / 255.)
+                noise1 = torch.cuda.FloatTensor(img_train.size()).normal_(mean=0, std=stdN / 255.) #AG CG
+                noise = np.zeros((img_train.size()[2],img_train.size()[3]),dtype=np.uint8) #SP
+                cv2.randu(noise,0,255) #SP
+                noisew = cv2.threshold(noise,220,255,cv2.THRESH_BINARY)[1]*(-1) #SP
+                cv2.randu(noise,0,255) #SP
+                noiseb = cv2.threshold(noise,220,255,cv2.THRESH_BINARY)[1] #SP
+                noise = noiseb+noisew #SP
+                noise = torch.cuda.FloatTensor(noise) #SP
+                con_noise = np.concatenate([np.random.normal(0, 15/225, size=(img_train.size()[2]//2, img_train.size()[3])),np.random.normal(0, 50/255, size=(img_train.size()[2]//2, img_train.size()[3]))]) #CG change +1 accordingly
+                np.random.shuffle(con_noise) #CG
+                con_noise = torch.cuda.FloatTensor(con_noise) #CG
                 ########################################################################################################
-                imgn_train = img_train + noise
+                #imgn_train = torch.poisson(img_train) #P
+                #imgn_train = img_train + noise #AG #SP
+                #imgn_train = img_train + noise + con_noise #CG
+                #imgn_train = img_train + noise + noise1 + con_noise #comb
                 img_train, imgn_train = Variable(img_train), Variable(imgn_train)
 
                 outn_train, oloss = model(imgn_train, stdNv)

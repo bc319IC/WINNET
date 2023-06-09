@@ -77,7 +77,7 @@ def main():
         np.random.shuffle(con_noise) #CG
         con_noise = torch.FloatTensor(con_noise) #CG
         # noisy image
-        #INoisy = ISource + noise #AG SP
+        INoisy = ISource + noise #AG SP
         #INoisy = torch.poisson(ISource) #P
         INoisy = ISource + noise + con_noise #CG
         ISource, INoisy = Variable(ISource.cuda()), Variable(INoisy.cuda())
