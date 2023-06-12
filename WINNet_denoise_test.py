@@ -65,21 +65,21 @@ def main():
         Img = np.expand_dims(Img, 1)
         ISource = torch.Tensor(Img)
         # noise
-        noise = torch.FloatTensor(ISource.size()).normal_(mean=0, std=opt.test_noiseL/255.) # AG CG
-        #noise = np.zeros((ImgT.shape[0],ImgT.shape[1]),dtype=np.uint8) #SP
-        #cv2.randu(noise,0,255) #SP
-        #noisew = cv2.threshold(noise,220,255,cv2.THRESH_BINARY)[1]*(-1) #SP
-        #cv2.randu(noise,0,255) #SP
-        #noiseb = cv2.threshold(noise,220,255,cv2.THRESH_BINARY)[1] #SP
-        #noise = noiseb+noisew #SP
-        #noise = torch.Tensor(noise) #SP
+        #noise = torch.FloatTensor(ISource.size()).normal_(mean=0, std=opt.test_noiseL/255.) # AG CG
+        noise = np.zeros((ImgT.shape[0],ImgT.shape[1]),dtype=np.uint8) #SP
+        cv2.randu(noise,0,255) #SP
+        noisew = cv2.threshold(noise,220,255,cv2.THRESH_BINARY)[1]*(-1) #SP
+        cv2.randu(noise,0,255) #SP
+        noiseb = cv2.threshold(noise,220,255,cv2.THRESH_BINARY)[1] #SP
+        noise = noiseb+noisew #SP
+        noise = torch.Tensor(noise) #SP
         con_noise = np.concatenate([np.random.normal(0, 15/225, size=(ImgT.shape[0]//2, ImgT.shape[1])),np.random.normal(0, 50/255, size=(ImgT.shape[0]//2, ImgT.shape[1]))]) #CG change +1 accordingly
         np.random.shuffle(con_noise) #CG
         con_noise = torch.FloatTensor(con_noise) #CG
         # noisy image
         INoisy = ISource + noise #AG SP
         #INoisy = torch.poisson(ISource) #P
-        INoisy = ISource + noise + con_noise #CG
+        #INoisy = ISource + noise + con_noise #CG
         ISource, INoisy = Variable(ISource.cuda()), Variable(INoisy.cuda())
 
         stdNv_test = Variable(opt.test_noiseL * torch.ones(1).cuda())
